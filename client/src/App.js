@@ -4,6 +4,12 @@ import axios from "axios";
 
 function App() {
   const [users, setUsers] = useState([]);
+
+  const socket = new WebSocket("ws://localhost:5002");
+  socket.addEventListener("open", function (event) {
+    console.log("Connected to WS Server");
+  });
+
   const getUsers = () => {
     axios
       .get("users")
@@ -18,9 +24,13 @@ function App() {
         );
       });
   };
+  const abortAPICall = () => {
+    socket.send("Abort");
+  };
   return (
     <div className="App">
       <button onClick={getUsers}>GET USERS</button>
+      <button onClick={abortAPICall}>CANCEL USERS API</button>
       <div className="DataContainer">
         {users && (
           <ul>
