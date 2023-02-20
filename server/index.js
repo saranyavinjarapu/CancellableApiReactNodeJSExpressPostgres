@@ -73,7 +73,7 @@ const getUsers = async (request, response) => {
       .then((res) => {
         let pid = res.rows[0].pg_backend_pid;
         runQuery(pool, response);
-        abortQuery(pool, pid, response);
+        if (pid) abortQuery(pool, pid, response);
       })
       .catch((err) => {
         response.status(501).send(processErrorMessage(err, "Query Failed"));
