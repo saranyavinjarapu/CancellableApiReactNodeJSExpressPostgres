@@ -14,6 +14,7 @@ function App() {
   });
 
   const getUsers = () => {
+    setUsers([]);
     axios
       .get("users", {
         cancelToken: source.token,
