@@ -4,6 +4,7 @@ import axios from "axios";
 
 function App() {
   const [users, setUsers] = useState([]);
+  const [showCancelNotification, setShowCancelNotification] = useState(false);
   const CancelToken = axios.CancelToken;
   const source = CancelToken.source();
 
@@ -35,20 +36,29 @@ function App() {
   const abortAPICall = () => {
     source.cancel("Operation canceled by the user.");
     socket.send("Abort");
+    setShowCancelNotification(true);
+    setTimeout(function () {
+      setShowCancelNotification(false);
+    }, 2000);
   };
   return (
     <div className="App">
-      <button onClick={getUsers}>GET USERS</button>
-      <button onClick={abortAPICall}>CANCEL USERS API</button>
-      <div className="DataContainer">
-        {users && (
-          <ul>
-            {users.map((user) => (
-              <li key={user.id}>{user.name}</li>
-            ))}
-          </ul>
-        )}
+      <div className="Main">
+        <button onClick={getUsers}>GET USERS</button>
+        <button onClick={abortAPICall}>CANCEL USERS API</button>
+        <div className="DataContainer">
+          {users && (
+            <ul>
+              {users.map((user) => (
+                <li key={user.id}>{user.name}</li>
+              ))}
+            </ul>
+          )}
+        </div>
       </div>
+      {showCancelNotification && (
+        <div className="Notification">User Request/Operation Canceled</div>
+      )}
     </div>
   );
 }
