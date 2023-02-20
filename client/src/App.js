@@ -4,6 +4,8 @@ import axios from "axios";
 
 function App() {
   const [users, setUsers] = useState([]);
+  const CancelToken = axios.CancelToken;
+  const source = CancelToken.source();
 
   const socket = new WebSocket("ws://localhost:5002");
   socket.addEventListener("open", function (event) {
@@ -12,19 +14,26 @@ function App() {
 
   const getUsers = () => {
     axios
-      .get("users")
+      .get("users", {
+        cancelToken: source.token,
+      })
       .then((res) => {
         console.log("recieved res is :", res);
         setUsers(res.data);
       })
       .catch(function (thrown) {
-        let errorResponseMessage = thrown.response.data;
-        console.log(
-          errorResponseMessage ? errorResponseMessage : thrown.message
-        );
+        if (axios.isCancel(thrown)) {
+          console.log("Request canceled", thrown.message);
+        } else {
+          let errorResponseMessage = thrown.response.data;
+          console.log(
+            errorResponseMessage ? errorResponseMessage : thrown.message
+          );
+        }
       });
   };
   const abortAPICall = () => {
+    source.cancel("Operation canceled by the user.");
     socket.send("Abort");
   };
   return (
